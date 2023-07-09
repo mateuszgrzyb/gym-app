@@ -3,6 +3,7 @@ package mateuszgrzyb.gym_app.db
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
@@ -14,10 +15,10 @@ interface WorkoutDao {
     @Query("SELECT * FROM workout")
     fun getAll(): Flow<List<WorkoutWithExercises>>
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(workout: Workout): Long
 
-    @Update
+    @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun update(workout: Workout)
 
     @Delete

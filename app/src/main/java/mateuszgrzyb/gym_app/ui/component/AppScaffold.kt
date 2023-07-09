@@ -1,4 +1,4 @@
-package mateuszgrzyb.gym_app.ui.components
+package mateuszgrzyb.gym_app.ui.component
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
@@ -23,8 +23,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import mateuszgrzyb.gym_app.R
 import mateuszgrzyb.gym_app.activities.WorkoutsActivity
 import mateuszgrzyb.gym_app.activities.SettingsActivity
 import mateuszgrzyb.gym_app.toBoolean
@@ -51,7 +53,7 @@ fun AppScaffold(
                     NavigationDrawerItem(
                         modifier = Modifier.padding(10.dp, 5.dp),
                         label = {
-                            Text("Main")
+                            Text(stringResource(R.string.workouts_tab))
                         },
                         selected = contextViewModel.currentClassName() == WorkoutsActivity::class.qualifiedName,
                         onClick = { contextViewModel.switchActivity(WorkoutsActivity::class.java) }
@@ -59,7 +61,7 @@ fun AppScaffold(
                     NavigationDrawerItem(
                         modifier = Modifier.padding(10.dp, 5.dp),
                         label = {
-                            Text("Settings")
+                            Text(stringResource(R.string.settings_tab))
                         },
                         selected = contextViewModel.currentClassName() == SettingsActivity::class.qualifiedName,
                         onClick = { contextViewModel.switchActivity(SettingsActivity::class.java) }

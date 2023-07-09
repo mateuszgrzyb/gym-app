@@ -1,4 +1,4 @@
-package mateuszgrzyb.gym_app.ui.components
+package mateuszgrzyb.gym_app.ui.component
 
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items

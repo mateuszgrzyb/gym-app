@@ -1,4 +1,4 @@
-package mateuszgrzyb.gym_app.ui.components
+package mateuszgrzyb.gym_app.ui.component.dialog
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.AlertDialog
@@ -15,14 +15,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
 import mateuszgrzyb.gym_app.R
 import mateuszgrzyb.gym_app.cap
+import mateuszgrzyb.gym_app.db.WorkoutWithExercises
+
 
 @ExperimentalMaterial3Api
 @Composable
-fun NewWorkoutDialog(
+fun BaseWorkoutDialog(
+    confirmText: String,
+    title: String,
+    workout: WorkoutWithExercises?,
     onConfirm: (Workout) -> Unit,
     onDismiss: () -> Unit,
 ) {
-    var name by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf(workout?.workout?.name ?: "") }
+    var notes by remember { mutableStateOf(workout?.workout?.notes ?: "") }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -30,17 +36,18 @@ fun NewWorkoutDialog(
             Button(
                 onClick = {
                     val data = Workout(
-                        id = 0,
+                        id = workout?.workout?.id ?: 0,
                         name = name,
+                        notes = notes,
                     )
                     onConfirm(data)
                 }
             ) {
-                Text(stringResource(R.string.create))
+                Text(confirmText)
             }
         },
         title = {
-            Text(stringResource(R.string.create_exercise_title))
+            Text(title)
         },
         text = {
             Column {
@@ -50,6 +57,13 @@ fun NewWorkoutDialog(
                     },
                     value = name,
                     onValueChange = { name = it }
+                )
+                TextField(
+                    label = {
+                        Text(stringResource(R.string.notes).cap)
+                    },
+                    value = notes,
+                    onValueChange = { notes = it }
                 )
             }
         }

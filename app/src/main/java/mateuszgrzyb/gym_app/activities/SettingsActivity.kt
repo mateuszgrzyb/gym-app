@@ -10,7 +10,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import dagger.hilt.android.AndroidEntryPoint
-import mateuszgrzyb.gym_app.ui.components.AppScaffold
+import mateuszgrzyb.gym_app.ui.component.AppScaffold
 import mateuszgrzyb.gym_app.ui.theme.GymappTheme
 
 @ExperimentalMaterial3Api

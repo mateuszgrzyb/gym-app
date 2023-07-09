@@ -4,15 +4,21 @@
     <string name="delete">Usuń</string>
     <string name="delete_exercise_body">Czy jesteś pewien że chcesz usunąć ćwiczenie %1$s?</string>
     <string name="delete_exercise_title">Usuwanie ćwiczenia</string>
-    <string name="delete_workout_title">Usuń plan</string>
+    <string name="delete_workout_title">Usuń plan treningowy</string>
     <string name="delete_workout_body">Czy jesteś pewien że chcesz usunąć plan %1$s?</string>
     <string name="editing_title">Edycja %1$s</string>
-    <string name="workouts_title">Plany</string>
+    <string name="workouts_title">Plany treningowe</string>
     <string name="sets">serie</string>
     <string name="reps">powtórzenia</string>
     <string name="weight">waga</string>
     <string name="create">Utwórz</string>
     <string name="create_exercise_title">Utwórz nowe ćwiczenie</string>
     <string name="name">nazwa</string>
-    <string name="create_workout_title">Utwórz nowy plan</string>
+    <string name="create_workout_title">Utwórz nowy plan treningowy</string>
+    <string name="workouts_tab">Plany treningowe</string>
+    <string name="settings_tab">Ustawienia</string>
+    <string name="update">Zaktualizuj</string>
+    <string name="update_exercise_title">Zaktualizuj ćwiczenie</string>
+    <string name="update_workout_title">Zaktualizuj plan treningowy</string>
+    <string name="notes">notatki</string>
 </resources>

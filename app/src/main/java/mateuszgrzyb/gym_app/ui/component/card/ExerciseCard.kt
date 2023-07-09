@@ -1,6 +1,5 @@
-package mateuszgrzyb.gym_app.ui.components
+package mateuszgrzyb.gym_app.ui.component.card
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -17,9 +16,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,8 +46,9 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import mateuszgrzyb.gym_app.R
 import mateuszgrzyb.gym_app.db.Exercise
+import mateuszgrzyb.gym_app.ui.component.dialog.DeleteExerciseDialog
+import mateuszgrzyb.gym_app.ui.component.dialog.UpdateExerciseDialog
 import mateuszgrzyb.gym_app.viewmodels.WorkoutsViewModel
-import kotlin.math.abs
 import kotlin.math.roundToInt
 
 enum class DragState {
@@ -59,8 +61,17 @@ fun between(min: Int, v: Int, max: Int): Int {
     return if (v < min) { min } else if (max < v) { max } else { v }
 }
 
+
+enum class DialogState {
+    Closed,
+    OpenDelete,
+    OpenUpdate,
+}
+
+@ExperimentalMaterial3Api
 @Composable
 fun ExerciseCard(
+    workoutId: Long,
     editable: Boolean,
     workoutsViewModel: WorkoutsViewModel = viewModel(),
     exercise: Exercise,
@@ -72,7 +83,7 @@ fun ExerciseCard(
 
     val dragInteractionFlow = remember { MutableSharedFlow<DragState>() }
 
-    var openDeleteExerciseDialog by remember { mutableStateOf(false) }
+    var dialogState by remember { mutableStateOf(DialogState.Closed) }
 
     val maxOffset = 250
 
@@ -114,8 +125,13 @@ fun ExerciseCard(
             when (dragState) {
                 DragState.Start -> {}
                 DragState.Stop -> {
-                    if (editable && abs(offsetX) >= maxOffset) {
-                        openDeleteExerciseDialog = true
+                    if (editable) {
+                        if (-maxOffset < offsetX && offsetX < maxOffset) {
+                        } else if (-maxOffset >= offsetX) {
+                            dialogState = DialogState.OpenDelete
+                        } else {
+                            dialogState = DialogState.OpenUpdate
+                        }
                     }
                     offsetX = 0f
                 }
@@ -123,18 +139,28 @@ fun ExerciseCard(
         }
     }
 
-    if (openDeleteExerciseDialog) {
-        DeleteExerciseDialog(
+    when (dialogState) {
+        DialogState.Closed -> {}
+        DialogState.OpenDelete -> DeleteExerciseDialog(
             exercise = exercise,
             onConfirm = {
-                coroutineScope.launch {
-                    workoutsViewModel.deleteExercise(it)
-                }
-                openDeleteExerciseDialog = false
+                workoutsViewModel.deleteExercise(it)
+                dialogState = DialogState.Closed
             },
             onDismiss = {
-                openDeleteExerciseDialog = false
+                dialogState = DialogState.Closed
             }
+        )
+        DialogState.OpenUpdate -> UpdateExerciseDialog(
+            workoutId = workoutId,
+            exercise = exercise,
+            onConfirm = {
+                workoutsViewModel.updateExercise(it)
+                dialogState = DialogState.Closed
+            },
+            onDismiss = {
+                dialogState = DialogState.Closed
+            },
         )
     }
 
@@ -153,19 +179,38 @@ fun ExerciseCard(
                     width = Dimension.fillToConstraints
                 }
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .width(maxOffset.dp)
-                    .background(color = Color.Red)
-            ) {
-                Column(
+            Row {
+                Box(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(15.dp),
-                    verticalArrangement = Arrangement.Center,
+                        .fillMaxHeight()
+                        .width(maxOffset.dp)
+                        .background(color = Color.Gray)
                 ) {
-                    Icon(Icons.Default.Delete, contentDescription = null)
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(15.dp),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.Start,
+                    ) {
+                        Icon(Icons.Default.Edit, contentDescription = null)
+                    }
+                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .width(maxOffset.dp)
+                        .background(color = Color.Red)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(15.dp),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.End,
+                    ) {
+                        Icon(Icons.Default.Delete, contentDescription = null)
+                    }
                 }
             }
         }

@@ -15,4 +15,10 @@
     <string name="create_exercise_title">Create new exercise</string>
     <string name="name">name</string>
     <string name="create_workout_title">Create new workout</string>
+    <string name="workouts_tab">Workouts</string>
+    <string name="settings_tab">Settings</string>
+    <string name="update">Update</string>
+    <string name="update_exercise_title">Update exercise</string>
+    <string name="update_workout_title">Update workout</string>
+    <string name="notes">notes</string>
 </resources>

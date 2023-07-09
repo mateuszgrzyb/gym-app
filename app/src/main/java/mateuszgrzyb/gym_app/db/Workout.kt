@@ -7,4 +7,5 @@ import androidx.room.PrimaryKey
 data class Workout(
     @PrimaryKey(autoGenerate = true) val id: Long,
     val name: String?,
+    val notes: String?,
 )

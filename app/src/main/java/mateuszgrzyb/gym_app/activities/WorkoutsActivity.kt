@@ -7,11 +7,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import mateuszgrzyb.gym_app.ui.theme.GymappTheme
 import dagger.hilt.android.AndroidEntryPoint
-import mateuszgrzyb.gym_app.ui.components.WorkoutDetailsApp
-import mateuszgrzyb.gym_app.ui.components.WorkoutsListApp
+import mateuszgrzyb.gym_app.ui.component.WorkoutDetailsApp
+import mateuszgrzyb.gym_app.ui.component.WorkoutsListApp
 import mateuszgrzyb.gym_app.viewmodels.WorkoutsViewModel
 
 
@@ -30,7 +32,8 @@ class WorkoutsActivity : BaseActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val workoutsViewModel: WorkoutsViewModel by viewModels()
-                    val currentWorkout = workoutsViewModel.currentWorkout;
+                    val workouts by workoutsViewModel.workouts.observeAsState(listOf())
+                    val currentWorkout = workouts.find { w -> w.workout.id == workoutsViewModel.currentWorkoutId }
 
                     if (currentWorkout == null) {
                         WorkoutsListApp()

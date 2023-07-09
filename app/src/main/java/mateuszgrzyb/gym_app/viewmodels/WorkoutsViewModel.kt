@@ -1,6 +1,9 @@
 package mateuszgrzyb.gym_app.viewmodels
 
+import android.util.Log
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -19,62 +22,42 @@ import javax.inject.Inject
 class WorkoutsViewModel @Inject constructor(
     private val db: DB
 ): ViewModel() {
-    var workouts by mutableStateOf(listOf<WorkoutWithExercises>())
-        private set
 
-    init {
+    val workouts = db.workoutDao().getAll().asLiveData()
+
+    var currentWorkoutId by mutableStateOf<Long?>(null)
+
+    suspend fun addWorkout(workout: Workout): Long {
+        return db.workoutDao().insert(workout)
+    }
+
+    fun addExercise(exercise: Exercise) {
         viewModelScope.launch {
-            db.workoutDao().getAll().collectLatest { ws ->
-                workouts = ws
-            }
+            db.exerciseDao().insert(exercise)
         }
     }
 
-    var currentWorkout by mutableStateOf<WorkoutWithExercises?>(null)
-        private set
-
-    fun setCurrentWorkout(workoutId: Long?) {
-        currentWorkout = workouts.find { it.workout.id == workoutId }
-    }
-
-    suspend fun add(workout: Workout): Long =
-        db.workoutDao().insert(workout)
-
-    suspend fun addExercise(exercise: Exercise): Long {
-        exercise.id = db.exerciseDao().insert(exercise)
-
-        workouts = workouts.map { w ->
-            if (w.workout.id != exercise.workoutId) {
-                w
-            } else {
-                WorkoutWithExercises(
-                    workout = w.workout,
-                    exercises = w.exercises + exercise
-                )
-            }
-        }
-
-        return exercise.id
-    }
-
-    suspend fun deleteExercise(exercise: Exercise) {
-        db.exerciseDao().delete(exercise)
-
-        workouts = workouts.map { w ->
-            if (w.workout.id != exercise.workoutId) {
-                w
-            } else {
-                WorkoutWithExercises(
-                    workout = w.workout,
-                    exercises = w.exercises.filter { it.id != exercise.id }
-                )
-            }
+    fun updateWorkout(workout: Workout) {
+        viewModelScope.launch {
+            db.workoutDao().update(workout)
         }
     }
 
-    suspend fun deleteWorkout(workout: Workout) {
-        db.workoutDao().delete(workout)
+    fun updateExercise(exercise: Exercise) {
+        viewModelScope.launch {
+            db.exerciseDao().update(exercise)
+        }
+    }
 
-        workouts = workouts.filter { it.workout.id == workout.id }
+    fun deleteWorkout(workout: Workout) {
+        viewModelScope.launch {
+            db.workoutDao().delete(workout)
+        }
+    }
+
+    fun deleteExercise(exercise: Exercise) {
+        viewModelScope.launch {
+            db.exerciseDao().delete(exercise)
+        }
     }
 }

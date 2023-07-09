@@ -1,4 +1,4 @@
-package mateuszgrzyb.gym_app.ui.components
+package mateuszgrzyb.gym_app.ui.component.dialog
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -8,13 +8,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import mateuszgrzyb.gym_app.R
-import mateuszgrzyb.gym_app.db.Workout
-import mateuszgrzyb.gym_app.displayName
+import mateuszgrzyb.gym_app.db.Exercise
 
 @Composable
-fun DeleteWorkoutDialog(
-    workout: Workout,
-    onConfirm: (Workout) -> Unit,
+fun DeleteExerciseDialog(
+    exercise: Exercise,
+    onConfirm: (Exercise) -> Unit,
     onDismiss: () -> Unit,
 ) {
     AlertDialog(
@@ -25,7 +24,7 @@ fun DeleteWorkoutDialog(
                     containerColor = Color.Red,
                     contentColor = Color.White,
                 ),
-                onClick = { onConfirm(workout) }
+                onClick = { onConfirm(exercise) }
             ) {
                 Text(stringResource(R.string.delete))
             }
@@ -38,10 +37,10 @@ fun DeleteWorkoutDialog(
             }
         },
         title = {
-            Text(stringResource(R.string.delete_workout_title))
+            Text(stringResource(R.string.delete_exercise_title))
         },
         text = {
-            Text(stringResource(R.string.delete_workout_body, displayName(workout)))
+            Text(stringResource(R.string.delete_exercise_body, exercise.name))
         }
     )
 }

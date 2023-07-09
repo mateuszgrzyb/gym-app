@@ -1,4 +1,4 @@
-package mateuszgrzyb.gym_app.ui.components
+package mateuszgrzyb.gym_app.ui.component
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -22,6 +22,11 @@ import mateuszgrzyb.gym_app.R
 import mateuszgrzyb.gym_app.db.WorkoutWithExercises
 import mateuszgrzyb.gym_app.viewmodels.WorkoutsViewModel
 import mateuszgrzyb.gym_app.displayName
+import mateuszgrzyb.gym_app.ui.component.card.ExerciseCard
+import mateuszgrzyb.gym_app.ui.component.card.WorkoutCard
+import mateuszgrzyb.gym_app.ui.component.dialog.DeleteWorkoutDialog
+import mateuszgrzyb.gym_app.ui.component.dialog.CreateExerciseDialog
+import mateuszgrzyb.gym_app.ui.component.dialog.NewWorkoutDialog
 
 @ExperimentalMaterial3Api
 @Composable
@@ -29,16 +34,15 @@ fun WorkoutsListApp(
     workoutsViewModel: WorkoutsViewModel = viewModel(),
 ) {
     val coroutineScope = rememberCoroutineScope()
-
     var openDialog by remember { mutableStateOf(false) }
 
     if (openDialog) {
         NewWorkoutDialog(
             onConfirm = {
                 coroutineScope.launch {
-                    val workoutId = workoutsViewModel.add(it)
+                    val workoutId = workoutsViewModel.addWorkout(it)
                     openDialog = false
-                    workoutsViewModel.setCurrentWorkout(workoutId)
+                    workoutsViewModel.currentWorkoutId = workoutId
                 }
             },
             onDismiss = {
@@ -63,7 +67,13 @@ fun WorkoutsListApp(
         },
 
     ) { contentModifier ->
-        WorkoutsList(modifier = contentModifier)
+        WorkoutsList(
+            modifier = contentModifier,
+        ) {
+            WorkoutCard(
+                workout = it,
+            )
+        }
     }
 }
 
@@ -73,8 +83,6 @@ fun WorkoutDetailsApp(
     workout: WorkoutWithExercises,
     workoutsViewModel: WorkoutsViewModel = viewModel(),
 ) {
-    val coroutineScope = rememberCoroutineScope()
-
     var editing by remember { mutableStateOf(false) }
     val title = displayName(workout.workout)
 
@@ -82,12 +90,10 @@ fun WorkoutDetailsApp(
     var openDeleteWorkoutDialog by remember { mutableStateOf(false) }
 
     if (openNewExerciseDialog) {
-        NewExerciseDialog(
+        CreateExerciseDialog(
             workoutId = workout.workout.id,
             onConfirm = {
-                coroutineScope.launch {
-                    workoutsViewModel.addExercise(it)
-                }
+                workoutsViewModel.addExercise(it)
                 openNewExerciseDialog = false
             },
             onDismiss = {
@@ -100,10 +106,8 @@ fun WorkoutDetailsApp(
         DeleteWorkoutDialog(
             workout = workout.workout,
             onConfirm = {
-                coroutineScope.launch {
-                    workoutsViewModel.deleteWorkout(workout.workout)
-                    workoutsViewModel.setCurrentWorkout(null)
-                }
+                workoutsViewModel.deleteWorkout(workout.workout)
+                workoutsViewModel.currentWorkoutId = null
                 openDeleteWorkoutDialog = false
             },
             onDismiss = {
@@ -121,13 +125,15 @@ fun WorkoutDetailsApp(
                     contentDescription = null,
                 )
             }
-            IconButton(onClick = { openDeleteWorkoutDialog = true }) {
-                Icon(
-                    Icons.Filled.Delete,
-                    contentDescription = null,
-                )
+            if (editing) {
+                IconButton(onClick = { openDeleteWorkoutDialog = true }) {
+                    Icon(
+                        Icons.Filled.Delete,
+                        contentDescription = null,
+                    )
+                }
             }
-            IconButton(onClick = { workoutsViewModel.setCurrentWorkout(null) }) {
+            IconButton(onClick = { workoutsViewModel.currentWorkoutId = null }) {
                 Icon(
                     Icons.Filled.ArrowBack,
                     contentDescription = null,
@@ -154,6 +160,7 @@ fun WorkoutDetailsApp(
             modifier = contentModifier,
         ) {
             ExerciseCard(
+                workoutId = workout.workout.id,
                 editable = editing,
                 exercise = it,
             )

@@ -20,7 +20,7 @@ import mateuszgrzyb.gym_app.WeightUnit
     indices = [Index("workout_id")],
 )
 data class Exercise(
-    @PrimaryKey(autoGenerate = true) var id: Long,
+    @PrimaryKey(autoGenerate = true) val id: Long,
     @ColumnInfo(name = "workout_id") val workoutId: Long,
     val name: String,
     val sets: Int,
