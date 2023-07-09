@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name" translatable="false">Gym App</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+    <string name="delete_exercise_title">Delete exercise</string>
+    <string name="delete_exercise_body">Are you sure you want to delete the exercise %1$s?</string>
+    <string name="delete_workout_title">Delete workout</string>
+    <string name="delete_workout_body">Are you sure you wanto to delete the workout %1$s?</string>
+    <string name="editing_title">Editing %1$s</string>
+    <string name="workouts_title">Workouts</string>
+    <string name="sets">sets</string>
+    <string name="reps">reps</string>
+    <string name="weight">weight</string>
+    <string name="create">Create</string>
+    <string name="create_exercise_title">Create new exercise</string>
+    <string name="name">name</string>
+    <string name="create_workout_title">Create new workout</string>
+</resources>
