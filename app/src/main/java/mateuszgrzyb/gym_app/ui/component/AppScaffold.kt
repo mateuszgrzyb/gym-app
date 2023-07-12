@@ -1,10 +1,13 @@
 package mateuszgrzyb.gym_app.ui.component
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material3.Button
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -14,6 +17,8 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -32,10 +37,15 @@ import mateuszgrzyb.gym_app.activities.SettingsActivity
 import mateuszgrzyb.gym_app.toBoolean
 import mateuszgrzyb.gym_app.toDrawerValue
 import mateuszgrzyb.gym_app.viewmodels.ContextViewModel
+import mateuszgrzyb.gym_app.viewmodels.SnackbarViewModel
+import mateuszgrzyb.gym_app.viewmodels.WorkoutsViewModel
 
+@ExperimentalLayoutApi
 @ExperimentalMaterial3Api
 @Composable
 fun AppScaffold(
+    snackbarViewModel: SnackbarViewModel = viewModel(),
+    workoutsViewModel: WorkoutsViewModel = viewModel(),
     contextViewModel: ContextViewModel = viewModel(),
     title: String,
     fap: @Composable () -> Unit = {},
@@ -85,10 +95,7 @@ fun AppScaffold(
                             checked = drawerVisible,
                             onCheckedChange = { drawerVisible = true }
                         ) {
-                            Icon(
-                                Icons.Default.List,
-                                contentDescription = null,
-                            )
+                            Icon(Icons.Default.List, null)
                         }
                     },
                     actions = actions,
@@ -97,6 +104,15 @@ fun AppScaffold(
                 )
             },
             floatingActionButton = fap,
+            snackbarHost = {
+                SnackbarHost(snackbarViewModel.hostState) {
+                    Snackbar(
+                        modifier = Modifier.padding(15.dp),
+                    ) {
+                        Text(it.visuals.message)
+                    }
+                }
+            }
         ) { contentPadding ->
             content(Modifier.padding(contentPadding))
         }

@@ -16,5 +16,5 @@ object Providers {
     @Provides
     @Singleton
     fun getDb(@ApplicationContext context: Context): DB =
-        Room.databaseBuilder(context, DB::class.java, "gym-app-12").build()
+        Room.databaseBuilder(context, DB::class.java, "gym-app").build()
 }

@@ -10,4 +10,7 @@ data class WorkoutWithExercises(
         entityColumn = "workout_id"
     )
     val exercises: List<Exercise>
-)
+) {
+    val sortedExercises: List<Exercise>
+        get() = exercises.sortedBy { it.ordering }
+}

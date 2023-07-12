@@ -6,7 +6,7 @@
     <string name="delete_exercise_title">Usuwanie ćwiczenia</string>
     <string name="delete_workout_title">Usuń plan treningowy</string>
     <string name="delete_workout_body">Czy jesteś pewien że chcesz usunąć plan %1$s?</string>
-    <string name="editing_title">Edycja %1$s</string>
+    <string name="editing_title">Edycja %s</string>
     <string name="workouts_title">Plany treningowe</string>
     <string name="sets">serie</string>
     <string name="reps">powtórzenia</string>
@@ -21,4 +21,18 @@
     <string name="update_exercise_title">Zaktualizuj ćwiczenie</string>
     <string name="update_workout_title">Zaktualizuj plan treningowy</string>
     <string name="notes">notatki</string>
+    <string name="save">Zapisz</string>
+    <string name="ads">Reklamy</string>
+    <string name="weight_unit">Jednostka wagi</string>
+    <string name="reordering_title">Zmiana kolejności %s</string>
+    <string name="snackbar_calendar_error">Nie można utworzyć wydarzenia w kalendarzu: Brak Uprawnień</string>
+    <string name="empty">Pusty</string>
+    <string name="workout_name">Plan %d</string>
+    <string name="total_exercises">"Ilość ćwiczeń: "</string>
+    <string name="total_sets">"Ilość serii: "</string>
+    <string name="total_volume">"Objętość treningowa: "</string>
+    <string name="create_calendar_event_title">Utwórz wydarzenie w kalendarzu</string>
+    <string name="workout_hours">Czas treningu (h)</string>
+    <string name="workout_offset_weeks">Przesunięcie treningu (tygodnie)</string>
+    <string name="training_weekdays">Wybierz dni treningowe</string>
 </resources>

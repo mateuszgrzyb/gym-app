@@ -15,16 +15,18 @@ import mateuszgrzyb.gym_app.WeightUnit
             parentColumns = ["id"],
             childColumns = ["workout_id"],
             onDelete = ForeignKey.CASCADE,
-        )
+        ),
     ],
-    indices = [Index("workout_id")],
+    indices = [
+        Index("workout_id"),
+    ],
 )
 data class Exercise(
     @PrimaryKey(autoGenerate = true) val id: Long,
     @ColumnInfo(name = "workout_id") val workoutId: Long,
+    val ordering: Int,
     val name: String,
     val sets: Int,
     val reps: Int,
     @ColumnInfo(name = "weight_value") val weightValue: Double,
-    @ColumnInfo(name = "weight_unit") val weightUnit: WeightUnit,
 )

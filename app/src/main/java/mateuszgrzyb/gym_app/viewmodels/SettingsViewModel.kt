@@ -1,34 +1,50 @@
 package mateuszgrzyb.gym_app.viewmodels
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import mateuszgrzyb.gym_app.db.DB
 import mateuszgrzyb.gym_app.db.Settings
 import javax.inject.Inject
 
+enum class PermissionsState {
+    Unverified,
+    Ok,
+    Failed,
+}
+
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val db: DB
 ): ViewModel() {
-    var settings by mutableStateOf(Settings())
-        private set
+
+    val optionalSettings = db.settingsDao().getOptional().asLiveData()
+    val settings = db.settingsDao().get().asLiveData()
+
+    var permissionsState = MutableLiveData(PermissionsState.Unverified)
 
     init {
         viewModelScope.launch {
-            db.settingsDao().get().collectLatest { s ->
-                settings = s
+            val s = db.settingsDao().getCoro()
+
+            if (s == null) {
+                db.settingsDao().insert(Settings())
             }
+
         }
     }
 
-    suspend fun updateSettings(newSettings: Settings) {
-        db.settingsDao().upsert(newSettings)
-        settings = newSettings
+    fun updateSettings(newSettings: Settings) {
+        viewModelScope.launch {
+            if (newSettings.id == 0L) {
+                val id = db.settingsDao().insert(newSettings)
+                newSettings.id = id
+            } else {
+                db.settingsDao().update(newSettings)
+            }
+        }
     }
 }

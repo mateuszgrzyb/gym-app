@@ -29,7 +29,6 @@ class ContextViewModel(
 
     private fun getFile(): List<String> {
         val c = getApplication() as Context
-        val s = R.raw.suggestions
         val ins: InputStream = c.resources.openRawResource(R.raw.suggestions)
         return ins.bufferedReader().use {
             it.lines().collect(Collectors.toList())

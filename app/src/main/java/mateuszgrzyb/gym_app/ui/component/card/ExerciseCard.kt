@@ -1,5 +1,7 @@
 package mateuszgrzyb.gym_app.ui.component.card
 
+import android.util.Log
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -22,10 +24,12 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -37,6 +41,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -46,8 +51,11 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import mateuszgrzyb.gym_app.R
 import mateuszgrzyb.gym_app.db.Exercise
+import mateuszgrzyb.gym_app.db.Settings
+import mateuszgrzyb.gym_app.ui.component.apps.DetailsState
 import mateuszgrzyb.gym_app.ui.component.dialog.DeleteExerciseDialog
 import mateuszgrzyb.gym_app.ui.component.dialog.UpdateExerciseDialog
+import mateuszgrzyb.gym_app.viewmodels.SettingsViewModel
 import mateuszgrzyb.gym_app.viewmodels.WorkoutsViewModel
 import kotlin.math.roundToInt
 
@@ -68,15 +76,21 @@ enum class DialogState {
     OpenUpdate,
 }
 
+const val MAX_OFFSET = 250
+
 @ExperimentalMaterial3Api
 @Composable
 fun ExerciseCard(
+    settingsViewModel: SettingsViewModel = viewModel(),
     workoutId: Long,
-    editable: Boolean,
+    detailsState: DetailsState,
     workoutsViewModel: WorkoutsViewModel = viewModel(),
     exercise: Exercise,
+    isDragged: Boolean = false,
 ) {
     val coroutineScope = rememberCoroutineScope()
+
+    val settings by settingsViewModel.settings.observeAsState(Settings())
 
     var clicked by remember { mutableStateOf(false) }
     var offsetX by remember { mutableStateOf(0f) }
@@ -85,9 +99,7 @@ fun ExerciseCard(
 
     var dialogState by remember { mutableStateOf(DialogState.Closed) }
 
-    val maxOffset = 250
-
-    var modifier = Modifier
+    var cardModifier = Modifier
         .padding(15.dp)
         .fillMaxWidth()
         .pointerInput(Unit) {
@@ -113,24 +125,24 @@ fun ExerciseCard(
             )
         }
 
-    if (!editable) {
-        modifier = modifier.clickable { clicked = !clicked }
-    } else {
-        modifier = modifier
-            .offset { IntOffset(between(-maxOffset, offsetX.roundToInt(), maxOffset), 0) }
+    cardModifier = when (detailsState) {
+        DetailsState.Display -> cardModifier.clickable { clicked = !clicked }
+        DetailsState.Edit -> cardModifier.offset {
+            IntOffset(between(-MAX_OFFSET, offsetX.roundToInt(), MAX_OFFSET), 0)
+        }
+        DetailsState.Reorder -> cardModifier
     }
 
-    LaunchedEffect(dragInteractionFlow, editable) {
+    LaunchedEffect(dragInteractionFlow, cardModifier) {
         dragInteractionFlow.collect { dragState ->
             when (dragState) {
                 DragState.Start -> {}
                 DragState.Stop -> {
-                    if (editable) {
-                        if (-maxOffset < offsetX && offsetX < maxOffset) {
-                        } else if (-maxOffset >= offsetX) {
-                            dialogState = DialogState.OpenDelete
-                        } else {
-                            dialogState = DialogState.OpenUpdate
+                    if (detailsState == DetailsState.Edit) {
+                        dialogState = when {
+                            -MAX_OFFSET < offsetX && offsetX < MAX_OFFSET -> dialogState
+                            -MAX_OFFSET >= offsetX -> DialogState.OpenDelete
+                            else -> DialogState.OpenUpdate
                         }
                     }
                     offsetX = 0f
@@ -155,7 +167,7 @@ fun ExerciseCard(
             workoutId = workoutId,
             exercise = exercise,
             onConfirm = {
-                workoutsViewModel.updateExercise(it)
+                workoutsViewModel.updateExercises(it)
                 dialogState = DialogState.Closed
             },
             onDismiss = {
@@ -183,7 +195,7 @@ fun ExerciseCard(
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .width(maxOffset.dp)
+                        .width(MAX_OFFSET.dp)
                         .background(color = Color.Gray)
                 ) {
                     Column(
@@ -193,13 +205,13 @@ fun ExerciseCard(
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.Start,
                     ) {
-                        Icon(Icons.Default.Edit, contentDescription = null)
+                        Icon(Icons.Default.Edit, null)
                     }
                 }
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .width(maxOffset.dp)
+                        .width(MAX_OFFSET.dp)
                         .background(color = Color.Red)
                 ) {
                     Column(
@@ -209,25 +221,32 @@ fun ExerciseCard(
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.End,
                     ) {
-                        Icon(Icons.Default.Delete, contentDescription = null)
+                        Icon(Icons.Default.Delete, null)
                     }
                 }
             }
         }
 
         Card(
-            modifier = modifier.constrainAs(card) {
+            modifier = cardModifier.constrainAs(card) {
                 top.linkTo(parent.top)
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
                 bottom.linkTo(parent.bottom)
             },
+            colors = CardDefaults.cardColors(
+                containerColor = if (isDragged) {
+                    Color.Gray
+                } else {
+                    MaterialTheme.colorScheme.surface
+                },
+            ),
             elevation = CardDefaults.cardElevation(
                 defaultElevation = 10.dp
             ),
         ) {
             Row {
-                if (!editable) {
+                if (detailsState == DetailsState.Display) {
                     Checkbox(
                         checked = clicked,
                         onCheckedChange = null,
@@ -240,10 +259,12 @@ fun ExerciseCard(
                     modifier = Modifier
                         .padding(15.dp)
                 ) {
+
+
                     Text(exercise.name, fontWeight = FontWeight.Bold)
                     Text("${stringResource(R.string.sets)}: ${exercise.sets}")
                     Text("${stringResource(R.string.reps)}: ${exercise.reps}")
-                    Text("${stringResource(R.string.weight)}: ${exercise.weightValue} ${exercise.weightUnit}")
+                    Text("${stringResource(R.string.weight)}: ${exercise.weightValue} ${settings.weightUnit}")
                 }
             }
         }

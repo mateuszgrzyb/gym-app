@@ -11,20 +11,24 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.lifecycle.viewmodel.compose.viewModel
 import mateuszgrzyb.gym_app.R
 import mateuszgrzyb.gym_app.WeightUnit
 import mateuszgrzyb.gym_app.cap
 import mateuszgrzyb.gym_app.db.Exercise
 import mateuszgrzyb.gym_app.ui.component.DropdownTextField
+import mateuszgrzyb.gym_app.viewmodels.WorkoutsViewModel
 
 @ExperimentalMaterial3Api
 @Composable
 fun BaseExerciseDialog(
+    workoutsViewModel: WorkoutsViewModel = viewModel(),
     confirmText: String,
     title: String,
     exercise: Exercise?,
@@ -32,13 +36,12 @@ fun BaseExerciseDialog(
     onConfirm: (Exercise) -> Unit,
     onDismiss: () -> Unit,
 ) {
+    val nextExerciseOrdering by workoutsViewModel.nextExerciseOrdering.observeAsState(0)
+    val ordering = exercise?.ordering ?: nextExerciseOrdering
     var name by remember { mutableStateOf(exercise?.name ?: "") }
     var sets by remember { mutableStateOf(exercise?.sets?.toString() ?: "") }
     var reps by remember { mutableStateOf(exercise?.reps?.toString() ?: "") }
     var weightValue by remember { mutableStateOf(exercise?.weightValue?.toString() ?: "") }
-    var weightUnit by remember { mutableStateOf(exercise?.weightUnit ?: WeightUnit.KG) }
-
-    var expanded by remember { mutableStateOf(false) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -51,7 +54,7 @@ fun BaseExerciseDialog(
                     sets = sets.toInt(),
                     reps = reps.toInt(),
                     weightValue = weightValue.toDouble(),
-                    weightUnit = weightUnit,
+                    ordering = ordering,
                 )
                 onConfirm(data)
             }) {
@@ -94,27 +97,6 @@ fun BaseExerciseDialog(
                     onValueChange = { weightValue = it },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
-                Button(onClick = { expanded = true }) {
-                    Text("$weightUnit")
-                }
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }) {
-                    DropdownMenuItem(
-                        text = { Text("KG") },
-                        onClick = {
-                            weightUnit = WeightUnit.KG
-                            expanded = false
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("LB") },
-                        onClick = {
-                            weightUnit = WeightUnit.LB
-                            expanded = false
-                        }
-                    )
-                }
             }
         }
     )

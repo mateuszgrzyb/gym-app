@@ -6,7 +6,7 @@
     <string name="delete_exercise_body">Are you sure you want to delete the exercise %1$s?</string>
     <string name="delete_workout_title">Delete workout</string>
     <string name="delete_workout_body">Are you sure you wanto to delete the workout %1$s?</string>
-    <string name="editing_title">Editing %1$s</string>
+    <string name="editing_title">Editing %s</string>
     <string name="workouts_title">Workouts</string>
     <string name="sets">sets</string>
     <string name="reps">reps</string>
@@ -21,4 +21,18 @@
     <string name="update_exercise_title">Update exercise</string>
     <string name="update_workout_title">Update workout</string>
     <string name="notes">notes</string>
+    <string name="save">Save</string>
+    <string name="ads">Ads</string>
+    <string name="weight_unit">Weight unit</string>
+    <string name="reordering_title">Reordering %s</string>
+    <string name="snackbar_calendar_error">Cannot create calendar event: Permission Denied</string>
+    <string name="empty">Empty</string>
+    <string name="workout_name">Workout %d</string>
+    <string name="total_exercises">Total exercises:</string>
+    <string name="total_sets">Total sets:</string>
+    <string name="total_volume">Total volume:</string>
+    <string name="create_calendar_event_title">Create calendar event</string>
+    <string name="workout_hours">Workout hours</string>
+    <string name="workout_offset_weeks">Offset workout (weeks)</string>
+    <string name="training_weekdays">Select weekdays for training</string>
 </resources>
